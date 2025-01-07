@@ -143,7 +143,7 @@ torch.cuda.manual_seed(2)
 
 model = Transformer(args)
 model = model.to(torch.bfloat16)
-state_dict = torch.load("/home/maroc/.llama/checkpoints/Llama3.1-8B/consolidated.00.pth")
+state_dict = torch.load("/home/maroc/.llama/checkpoints/Llama3.1-8B/consolidated.00.pth", map_location=torch.device('cpu'))
 model.load_state_dict_lora(state_dict) 
 model = model.to(torch.bfloat16)
 model.prepare_lora_gradients()
