@@ -43,7 +43,7 @@ parser.add_argument("--n_translation_tokens", type=int, default=0, help="Number 
 parser.add_argument("--max_batch_size", type=int, default=1, help="Maximum batch size")
 parser.add_argument("--max_seq_len", type=int, default=2048, help="Maximum sequence length")
 parser.add_argument("--alpha", type=float, default=16, help="Alpha value for some algorithm")
-parser.add_argument("--r", type=int, default=8, help="Reduction factor for some algorithm")
+parser.add_argument("--r", type=int, default=64, help="Reduction factor for some algorithm")
 parser.add_argument("--mixed_precision", type=bool, default=False, help="Use mixed precision training")
 parser.add_argument("--epochs", type=int, default=1, help="Number of training epochs")
 parser.add_argument("--ignore_index", type=int, default=128255, help="Index to ignore during loss computation")
@@ -53,11 +53,11 @@ parser.add_argument("--lr", type=float, default=1e-6, help="Learning rate")
 parser.add_argument("--checkpoint_path", type=str, default="", help="Path to save checkpoints")
 parser.add_argument("--checkpoint_epochs", type=int, default=1000000000, help="Checkpoint saving frequency in epochs")
 parser.add_argument("--init_lr", type=float, default=1e-6, help="Initial learning rate for scheduler")
-parser.add_argument("--max_lr", type=float, default=1e-3, help="Maximum learning rate for scheduler")
-parser.add_argument("--warmup_epochs", type=int, default=3000, help="Number of warmup epochs")
+parser.add_argument("--max_lr", type=float, default=2e-4, help="Maximum learning rate for scheduler")
+parser.add_argument("--warmup_epochs", type=int, default=12000, help="Number of warmup epochs")
 
 
-parser.add_argument("--gradient_accumulation", type=int, default=8, help="Number of gradient accumulation steps")
+parser.add_argument("--gradient_accumulation", type=int, default=16, help="Number of gradient accumulation steps")
 parser.add_argument("--model_parallel_size", type=int, default=1, help="model_parallel_size")
 parser.add_argument("--ckpt_dir", type=str, default="/users2/local/kilian/checkpoints/Llama3.1-8B", help="ckpt_dir")
 
