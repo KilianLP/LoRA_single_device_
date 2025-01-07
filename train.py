@@ -21,14 +21,7 @@ from torch.cuda.amp import autocast, GradScaler
 from torch.optim.lr_scheduler import LambdaLR
 import wandb
 import argparse 
-from fairscale.nn.model_parallel.initialize import (
-    get_model_parallel_rank,
-    initialize_model_parallel,
-    model_parallel_is_initialized,
-)
-import os
-import sys
-from pathlib import Path
+
 
 
 
@@ -47,7 +40,7 @@ parser.add_argument("--rope_theta", type=float, default=500000, help="Theta valu
 
 
 parser.add_argument("--n_translation_tokens", type=int, default=0, help="Number of translation tokens")
-parser.add_argument("--max_batch_size", type=int, default=2, help="Maximum batch size")
+parser.add_argument("--max_batch_size", type=int, default=1, help="Maximum batch size")
 parser.add_argument("--max_seq_len", type=int, default=2048, help="Maximum sequence length")
 parser.add_argument("--alpha", type=float, default=16, help="Alpha value for some algorithm")
 parser.add_argument("--r", type=int, default=8, help="Reduction factor for some algorithm")
@@ -65,7 +58,7 @@ parser.add_argument("--warmup_epochs", type=int, default=3000, help="Number of w
 
 
 parser.add_argument("--gradient_accumulation", type=int, default=8, help="Number of gradient accumulation steps")
-parser.add_argument("--model_parallel_size", type=int, default=4, help="model_parallel_size")
+parser.add_argument("--model_parallel_size", type=int, default=1, help="model_parallel_size")
 parser.add_argument("--ckpt_dir", type=str, default="/users2/local/kilian/checkpoints/Llama3.1-8B", help="ckpt_dir")
 
 
@@ -150,12 +143,12 @@ torch.cuda.manual_seed(2)
 
 model = Transformer(args)
 model = model.to(torch.bfloat16)
-model.load_state_dict_lora("/users2/local/kilian/checkpoints/Llama3.1-8B/") # to do 
+model.load_state_dict_lora("/home/maroc/.llama/checkpoints/Llama3.1-8B/consolidated.00.pth") 
 model = model.to(torch.bfloat16)
 model.prepare_lora_gradients()
 model.to('cuda')
 
-tokenizer = Tokenizer("/users2/local/kilian/checkpoints/Llama3.1-8B/tokenizer.model")
+tokenizer = Tokenizer("/home/maroc/.llama/checkpoints/Llama3.1-8B/tokenizer.model")
 
 train_dataloader, valid_dataloader = prepare_data_loaders(tokenizer)
 
@@ -248,6 +241,7 @@ for e in range(args.epochs):
         
         batch_epochs += 1
         scheduler.step()
+    
     
     blue_values_array = []
     for batch,target in valid_dataloader:
