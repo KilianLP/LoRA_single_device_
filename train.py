@@ -42,7 +42,7 @@ parser.add_argument("--rope_theta", type=float, default=500000, help="Theta valu
 parser.add_argument("--n_translation_tokens", type=int, default=0, help="Number of translation tokens")
 parser.add_argument("--max_batch_size", type=int, default=1, help="Maximum batch size")
 parser.add_argument("--max_seq_len", type=int, default=2048, help="Maximum sequence length")
-parser.add_argument("--alpha", type=float, default=16, help="Alpha value for some algorithm")
+parser.add_argument("--alpha", type=float, default=2048, help="Alpha value for some algorithm")
 parser.add_argument("--r", type=int, default=64, help="Reduction factor for some algorithm")
 parser.add_argument("--mixed_precision", type=bool, default=False, help="Use mixed precision training")
 parser.add_argument("--epochs", type=int, default=1, help="Number of training epochs")
@@ -54,7 +54,7 @@ parser.add_argument("--checkpoint_path", type=str, default="", help="Path to sav
 parser.add_argument("--checkpoint_epochs", type=int, default=1000000000, help="Checkpoint saving frequency in epochs")
 parser.add_argument("--init_lr", type=float, default=1e-6, help="Initial learning rate for scheduler")
 parser.add_argument("--max_lr", type=float, default=2e-4, help="Maximum learning rate for scheduler")
-parser.add_argument("--warmup_epochs", type=int, default=12000, help="Number of warmup epochs")
+parser.add_argument("--warmup_epochs", type=int, default=6000, help="Number of warmup epochs")
 
 
 parser.add_argument("--gradient_accumulation", type=int, default=16, help="Number of gradient accumulation steps")
@@ -239,9 +239,26 @@ for e in range(args.epochs):
                 optimizer.step()
         
         wandb.log({"train_loss": loss.item()})
+        wandb.log({"lr": optimizer.param_groups[0]['lr']})
         
         batch_epochs += 1
         scheduler.step()
+        
+        if batch_epochs % 30000 == 0:
+            blue_values_array = []
+            for batch,target in valid_dataloader:
+                
+                model.eval()
+                batch = batch.to('cuda')
+                target = target.to('cuda')
+                
+                prediction_logits = model(batch)
+                prediction = torch.argmax(prediction_logits, dim = -1)
+                
+                bleu_values = bleu_evaluation(target,prediction)
+                blue_values_array.append(np.mean(bleu_values))
+                
+            wandb.log({"Bleu": np.mean(blue_values_array)})
     
     
     blue_values_array = []
