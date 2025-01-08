@@ -244,7 +244,7 @@ for e in range(args.epochs):
         batch_epochs += 1
         scheduler.step()
         
-        if batch_epochs % 30000 == 0:
+        if batch_epochs % 12000 == 0:
             blue_values_array = []
             for batch,target in valid_dataloader:
                 
